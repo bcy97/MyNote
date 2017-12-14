@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>私人笔记-登录</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/login/styles.css">
+</head>
+<body>
+<div class="htmleaf-container">
+    <div class="wrapper">
+        <div class="container">
+            <h1>私人笔记</h1>
+
+            <form class="form" id="loginForm">
+                <input type="text" id="usernameIn" name="username" placeholder="用户名">
+                <input type="password" id="passIn" name="password" placeholder="密码">
+                <button type="button" id="login-button">登录</button>
+                <button type="button" id="register">注册</button>
+            </form>
+
+            <form class="form" id="registerForm" style="display: none;">
+                <input type="text" id="usernameRe" name="username" placeholder="用户名">
+                <input type="password" id="passRe" name="password" placeholder="密码">
+                <input type="password" id="confirm" placeholder="确认密码">
+                <button type="button" id="back-login">返回登录</button>
+                <button type="button" id="register-button">注册</button>
+            </form>
+
+        </div>
+
+        <ul class="bg-bubbles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+</div>
+
+<script src="/static/js/jquery-2.1.1.min.js"></script>
+<script>
+    $('#login-button').click(function (event) {
+        var username = $("#usernameIn");
+        var password = $("#passIn");
+        if (username.val() == "") {
+            username.attr("placeholder", "请输入用户名");
+        } else if (password.val() == "") {
+            password.attr("placeholder", "请输入密码");
+        } else {
+            $.ajax({
+                url: "/index/index/login",
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    username: username.val(),
+                    password: password.val()
+                },
+                success: function (data) {
+                    if (data == "success") {
+                        window.location.href = "/static/html/login/hello.html?username="+username.val();
+                    } else if (data == "passwordError") {
+                        password.val("");
+                        password.attr("placeholder", "输入密码错误");
+                    }else if(data=="admin"){
+                        window.location.href = "/static/html/admin/admin.html";
+                    }
+                }
+            })
+        }
+
+    });
+
+    $('#register').click(function (event) {
+        $("#loginForm").hide();
+        $("#registerForm").show();
+    });
+
+    $("#back-login").click(function (event) {
+        $("#loginForm").show();
+        $("#registerForm").hide();
+    })
+
+    $("#register-button").click(function (event) {
+
+        var username = $("#usernameRe");
+        var password = $("#passRe");
+        var confirm = $("#confirm");
+        confirm.attr("placeholder", "两次输入密码不一致");
+
+
+        if (username.val() == "") {
+            username.attr("placeholder", "请输入用户名");
+        } else if (password.val() == "") {
+            password.attr("placeholder", "请输入密码");
+        } else if (confirm.val() == "") {
+            confirm.attr("placeholder", "请确认密码");
+        } else if (password.val() != confirm.val()) {
+            confirm.val("");
+            confirm.attr("placeholder", "两次输入密码不一致");
+        } else {
+            $.ajax({
+                url: "/index/index/register",
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    username: username.val(),
+                    password: password.val()
+                },
+                success: function (data) {
+                    if (data == "success") {
+                        location.reload(true);
+                        $("#usernameIn").val(username.val());
+                    } else if (data == "exist") {
+                        username.val("");
+                        username.attr("placeholder", "该用户名已存在");
+                    }
+                }
+            })
+        }
+    })
+
+</script>
+</body>
+</html>
